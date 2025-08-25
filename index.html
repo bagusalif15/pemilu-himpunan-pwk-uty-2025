@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pemilihan Ketua dan Wakil Ketua Himpunan PWK UTY 2025</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 40px auto; text-align: center; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; }
+        #adminPanel { display: none; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h2>Pemilihan Ketua dan Wakil Ketua Himpunan Mahasiswa PWK UTY 2025</h2>
+    <input type="text" id="npm" placeholder="Masukkan NPM" required />
+    <select id="kandidat">
+        <option value="">-- Pilih Kandidat --</option>
+        <option value="Kandidat 1">Kandidat 1</option>
+        <option value="Kandidat 2">Kandidat 2</option>
+        <option value="Kandidat 3">Kandidat 3</option>
+    </select>
+    <button onclick="vote()">Kirim Suara</button>
+    <p id="status"></p>
+
+    <hr>
+    <button onclick="toggleAdmin()">Lihat Hasil Voting (Admin)</button>
+    <div id="adminPanel">
+        <h3>Hasil Voting</h3>
+        <ul id="hasilList"></ul>
+    </div>
+
+    <script>
+        function vote() {
+            const npm = document.getElementById('npm').value.trim();
+            const kandidat = document.getElementById('kandidat').value;
+            if (!npm || !kandidat) {
+                document.getElementById('status').innerText = 'Isi semua data!';
+                return;
+            }
+            if (localStorage.getItem(npm)) {
+                document.getElementById('status').innerText = 'NPM ini sudah memilih!';
+                return;
+            }
+            localStorage.setItem(npm, kandidat);
+            document.getElementById('status').innerText = 'Terima kasih, suara Anda telah tercatat.';
+        }
+
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            showResults();
+        }
+
+        function showResults() {
+            const hasil = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const npm = localStorage.key(i);
+                const kandidat = localStorage.getItem(npm);
+                hasil[kandidat] = (hasil[kandidat] || 0) + 1;
+            }
+            const list = document.getElementById('hasilList');
+            list.innerHTML = '';
+            for (const kandidat in hasil) {
+                const li = document.createElement('li');
+                li.textContent = `${kandidat}: ${hasil[kandidat]} suara`;
+                list.appendChild(li);
+            }
+        }
+    </script>
+</body>
+</html>
