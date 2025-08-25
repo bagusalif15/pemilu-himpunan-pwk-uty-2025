@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pemilu Himpunan PWK UTY 2025</title>
+</head>
+<body>
+  <h2>Pemilu Himpunan PWK UTY 2025</h2>
+  <form id="voteForm">
+    <label>Angkatan:</label>
+    <select id="angkatan" name="angkatan" required>
+      <option value="2022">2022</option>
+      <option value="2023">2023</option>
+      <option value="2024">2024</option>
+    </select>
+    <br>
+    <label>NPM:</label>
+    <input type="text" id="npm" name="npm" required>
+    <br>
+    <label>Pilih Pasangan Calon:</label>
+    <div id="paslonList"></div>
+    <button type="submit">Vote</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    // Fetch paslon
+    fetch('/paslon')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('paslonList');
+        data.forEach(paslon => {
+          container.innerHTML += `<input type="radio" name="paslon" value="${paslon.id}" required> ${paslon.nama} <br>`;
+        });
+      });
+
+    // Handle vote
+    document.getElementById('voteForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const angkatan = document.getElementById('angkatan').value;
+      const npm = document.getElementById('npm').value.trim();
+      const paslon = document.querySelector('input[name="paslon"]:checked').value;
+      const res = await fetch('/vote', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({angkatan, npm, paslon})
+      });
+      const hasil = await res.json();
+      document.getElementById('result').innerText = hasil.message;
+      if(hasil.success) document.getElementById('voteForm').reset();
+    }
+  </script>
+</body>
+</html>
